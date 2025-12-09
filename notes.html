@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<title>Deiv. Notes</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    #editor {
+        width: 100%;
+        min-height: 250px;
+        border: 1px solid #aaa;
+        padding: 10px;
+        outline: none;
+        white-space: pre-wrap;
+        font-size: 16px;
+        font-family: Consolas, monospace;
+    }
+    #saida {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px dashed #666;
+        white-space: pre-wrap;
+        font-family: Consolas, monospace;
+    }
+    button {
+        margin-top: 10px;
+        padding: 5px 15px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Deiv. Notes</h2>
+<div id="editor" contenteditable="true"></div>
+<button id="gerar">GERAR</button>
+<pre id="saida"></pre>
+
+<script>
+// Função para gerar saída horizontal
+function gerar() {
+    const texto = document.getElementById("editor").innerText;
+    const linhas = texto.split(/\n/);
+
+    let blocos = [];
+    let titulo = null;
+    let infos = [];
+
+    linhas.forEach(linha => {
+        // Linha vazia → finalizar bloco
+        if (linha.trim() === "") {
+            if (titulo !== null) {
+                blocos.push([titulo, ...infos]);
+            }
+            titulo = null;
+            infos = [];
+            return;
+        }
+
+        if (/^\S/.test(linha)) {
+            // É título
+            if (titulo !== null) {
+                blocos.push([titulo, ...infos]);
+            }
+            titulo = linha.trim();
+            infos = [];
+        } else {
+            // É informação
+            infos.push(linha.trim());
+        }
+    });
+
+    // Adiciona último bloco
+    if (titulo !== null) {
+        blocos.push([titulo, ...infos]);
+    }
+
+    // Monta saída
+    let saidaFinal = blocos.map(b => b.join(" | ")).join("\n");
+    document.getElementById("saida").textContent = saidaFinal;
+}
+
+document.getElementById("gerar").addEventListener("click", gerar);
+</script>
+
+</body>
+</html>
